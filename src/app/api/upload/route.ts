@@ -17,11 +17,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         // Otherwise, you're allowing anonymous uploads.
  
         return {
-          allowedContentTypes: ['image/jpeg', 'image/png', 'image/webp'],
           addRandomSuffix: true,
           tokenPayload: JSON.stringify({
             // optional, sent to your server on upload completion
-            // you could pass a user id from auth, or a value from clientPayload
           }),
         };
       },
@@ -36,6 +34,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           // Run any logic after the file upload completed
           // const { userId } = JSON.parse(tokenPayload);
           // await db.update({ avatar: blob.url, userId });
+
+
         } catch (error) {
           throw new Error('Could not update user');
         }

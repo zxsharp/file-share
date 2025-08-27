@@ -1,103 +1,180 @@
-import Image from "next/image";
+"use client"
+import { useEffect, useRef, useState } from "react";
+import { type PutBlobResult } from '@vercel/blob';
+import { upload } from '@vercel/blob/client';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { FilePlus2, FileText, File } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import DisplayFile from "@/components/DisplayFile";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const [file, setFile] = useState<File | null>(null);
+  const [blob, setBlob] = useState<PutBlobResult | null>(null)
+  const [showUrl, setShowUrl] = useState<boolean>(false);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [dragCounter, setDragCounter] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const hiddenFileInput = useRef<HTMLInputElement>(null);
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const selectedFile = e.target.files?.[0];
+    if(!selectedFile) return;
+    setFile(selectedFile);
+  }
+
+  async function handleUploadButtonClick(){
+    if (!file) return;
+
+    if((file.size / 1024 / 1024) > 100){
+      alert("Max Limit is 100MB because 1GB is all vercel blob is granting in free tier :(");
+      return;
+    }
+
+    setIsLoading(true);
+
+    const newBlob = await upload(file.name, file, {
+      access: 'public',
+      handleUploadUrl: '/api/upload',
+    });
+
+    console.log(newBlob);
+
+    setBlob(newBlob);
+    
+    setIsLoading(false);
+    setShowUrl(true);
+  }
+
+  function handleChooseButtonClick() {
+    if (hiddenFileInput.current) {
+      (hiddenFileInput.current as HTMLInputElement).click();
+    }
+  }
+
+
+  useEffect(() => {
+    const preventDefault = (e: DragEvent) => {
+      e.preventDefault();
+    };
+
+    // Prevent default drag behaviors on document
+    document.addEventListener('dragenter', preventDefault);
+    document.addEventListener('dragover', preventDefault);
+    document.addEventListener('dragleave', preventDefault);
+    document.addEventListener('drop', preventDefault);
+
+    return () => {
+      document.removeEventListener('dragenter', preventDefault);
+      document.removeEventListener('dragover', preventDefault);
+      document.removeEventListener('dragleave', preventDefault);
+      document.removeEventListener('drop', preventDefault);
+    };
+  }, []);
+
+  async function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    setIsDragging(false);
+    setDragCounter(0);
+
+    const droppedFile = e.dataTransfer.files?.[0];
+    if(droppedFile && !showUrl) {
+      setFile(droppedFile);
+    }
+  }
+
+  function handleDragEnter() {
+    setDragCounter(dragCounter + 1);
+    setIsDragging(true);
+  }
+
+  function handleDragLeave() {
+    setDragCounter(prev => {
+      const newCounter = prev - 1;
+      if (newCounter === 0) {
+        setIsDragging(false);
+      }
+      return newCounter;
+    });
+  }
+
+
+  return (
+    <div 
+      onDrop={handleDrop}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      className="min-h-screen"
+    >
+
+      {/* show top level background when dragging */}
+      {(isDragging && !showUrl) && 
+        <div className="fixed inset-0 z-[9999] bg-foreground/70 pointer-events-none flex justify-center text-3xl text-card/70 " />
+      }
+
+      {showUrl ||
+        <div  
+          className={`flex justify-center items-center min-h-screen bg-background`}
+        >
+          <Card
+            className="w-full max-w-lg bg-card border-dashed border-4">
+            <CardHeader className="text-center">
+              <div className="flex justify-center">
+                <FilePlus2 className="size-20"/>
+              </div>
+              <CardTitle>Drop your file here</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              {showUrl || 
+                <div className="flex justify-center">
+                  <Button 
+                    onClick={handleChooseButtonClick}
+                    className="bg-zinc-700 cursor-pointer rounded-none"
+                  >
+                    <File /> Choose File
+                  </Button>
+                  <Input 
+                    type="file"
+                    name="img"
+                    ref={hiddenFileInput}
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                  
+                </div>
+              }
+              {file && (
+                <div className="flex items-center gap-2 p-3 bg-muted rounded-md">
+                    <FileText className="h-4 w-4 text-primary" />
+                    <div className="flex-1">
+                        <p className="text-sm font-medium">{file.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                            {(file.size / 1024 / 1024).toFixed(2)} MB
+                        </p>
+                    </div>
+                </div>
+              )}
+              <Button
+                disabled={!file || isLoading}
+                onClick={handleUploadButtonClick}
+                className="w-full cursor-pointer"
+              >
+                {isLoading ? 'Uploading...': 'Upload'}
+              </Button>
+            </CardContent>
+          </Card>
+          
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      }
+
+      {showUrl && <DisplayFile blob={blob}/>}
+
     </div>
   );
 }
