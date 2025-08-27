@@ -45,7 +45,10 @@ export default function Home() {
       handleUploadUrl: '/api/upload',
     });
 
-    console.log(newBlob);
+    if(!newBlob){
+      alert("unable to upload try again");
+      return;
+    }
 
     setBlob(newBlob);
     
@@ -173,7 +176,7 @@ export default function Home() {
         </div>
       }
 
-      {showUrl && <DisplayFile blob={blob}/>}
+      {showUrl && blob && <DisplayFile {...blob} />}
 
     </div>
   );

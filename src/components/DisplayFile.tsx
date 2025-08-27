@@ -4,28 +4,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { type PutBlobResult } from "@vercel/blob"
 import {QRCodeCanvas} from 'qrcode.react'
 
-export default function DisplayFile({blob}: any) {
+export default function DisplayFile({ url, downloadUrl, pathname }: PutBlobResult) {
     return <div className="min-h-screen">
         <div className="flex flex-col justify-center items-center min-h-screen bg-background gap-4">
             <Card>
                 <CardContent className="space-y-5">
-                    <div>url - {blob.url}</div>
-                    <div>download url - {blob.download}</div>
-                    <div>file - {blob.pathname}</div>
+                    <div>url - {url}</div>
+                    <div>download url - {downloadUrl}</div>
+                    <div>file - {pathname}</div>
                 </CardContent>
             </Card>
             <Card>
                 <CardTitle>url</CardTitle>
                 <CardContent>
-                    <QRCodeCanvas value={blob.url} size={200} />
+                    <QRCodeCanvas value={url} size={200} />
                 </CardContent>
             </Card>
             <Card>
                 <CardTitle>Download url</CardTitle>
                 <CardContent>
-                    <QRCodeCanvas value={blob.downloadUrl} size={200} />
+                    <QRCodeCanvas value={downloadUrl} size={200} />
                 </CardContent>
             </Card>
         </div>
