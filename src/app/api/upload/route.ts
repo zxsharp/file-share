@@ -1,6 +1,11 @@
 import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import { NextRequest, NextResponse } from 'next/server';
- 
+import { prisma } from '@/lib/prisma';
+import { createUrlEntry } from '@/db/createUrlEntry';
+import { del } from '@vercel/blob';
+
+
+
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const body = (await request.json()) as HandleUploadBody;
  
@@ -35,9 +40,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           // const { userId } = JSON.parse(tokenPayload);
           // await db.update({ avatar: blob.url, userId });
 
+          await createUrlEntry(blob);
 
-        } catch (error) {
-          throw new Error('Could not update user');
+        } catch (err) {
+          console.log(err);
+          // deleting blob if unable to create it's entry in postgres
+          await del(blob.url);
         }
       },
     });
