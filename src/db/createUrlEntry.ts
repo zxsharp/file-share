@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { PutBlobResult } from '@vercel/blob';
 import { customAlphabet } from 'nanoid';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 const nanoid = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', 6);
 
