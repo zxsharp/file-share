@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { PutBlobResult } from '@vercel/blob';
 import { customAlphabet } from 'nanoid';
-import { Prisma } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
 
 const nanoid = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', 6);
 
@@ -25,7 +25,7 @@ export async function createUrlEntry(blob: PutBlobResult, maxRetries = 5){
         catch (err) {
         // Only handle known unique constraint violations
             if (
-                err instanceof Prisma.PrismaClientKnownRequestError &&
+                err instanceof PrismaClientKnownRequestError &&
                 err.code === 'P2002'
             ) {
                 const target = (err.meta?.target as string[]) ?? [];
