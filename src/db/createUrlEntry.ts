@@ -22,7 +22,7 @@ export async function createUrlEntry(blob: PutBlobResult, maxRetries = 5){
             // return if entry created successfully otherwise loop continues
             return; 
         }
-        catch (err: any) {
+        catch (err) {
         // Only handle known unique constraint violations
             if (
                 err instanceof Prisma.PrismaClientKnownRequestError &&
