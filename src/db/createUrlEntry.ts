@@ -5,10 +5,6 @@ import { Prisma } from '@prisma/client';
 
 const nanoid = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', 6);
 
-function generateNanoId(){
-    return nanoid()
-}
-
 export async function createUrlEntry(blob: PutBlobResult, maxRetries = 5){
     
     for(let attempt = 0; attempt <= maxRetries; attempt++){
@@ -22,6 +18,9 @@ export async function createUrlEntry(blob: PutBlobResult, maxRetries = 5){
                 expire: new Date(Date.now() + 60 * 60 * 1000) // expires in 1 hour
                 }
             })
+
+            // return if entry created successfully otherwise loop continues
+            return; 
         }
         catch (err: any) {
         // Only handle known unique constraint violations
