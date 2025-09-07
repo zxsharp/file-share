@@ -1,11 +1,17 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { findUrlEntry } from '@/db/findUrlEntry';
-import { Link } from 'lucide-react';
 
-export default async function IdPage({ params }: { params: { id: string } }) {
+type PropsType = {
+  params: Promise<{id: string}>
+}
+
+export default async function IdPage({ params }: PropsType) {
+  
+  const {id} = await params;
+  
   // direct db call, no api route needed as this will run on Server
-  const entry = await findUrlEntry(params.id); 
+  const entry = await findUrlEntry(id); 
   
   return <>
     
