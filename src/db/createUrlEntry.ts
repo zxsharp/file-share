@@ -5,14 +5,16 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 const nanoid = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', 6);
 
-export async function createUrlEntry(blob: PutBlobResult, maxRetries = 5){
+export async function createUrlEntry(blob: PutBlobResult, fileSize: number, fileName: string, maxRetries = 5){
     
     for(let attempt = 0; attempt <= maxRetries; attempt++){
         const id = nanoid();
         try {
-            await prisma.url.create({
+            const entry = await prisma.url.create({
                 data: {
-                id: id,
+                id,
+                fileSize,
+                fileName,
                 fileUrl: blob.url,
                 downloadUrl: blob.downloadUrl,
                 expire: new Date(Date.now() + 60 * 60 * 1000) // expires in 1 hour
@@ -20,7 +22,7 @@ export async function createUrlEntry(blob: PutBlobResult, maxRetries = 5){
             })
 
             // return if entry created successfully otherwise loop continues
-            return; 
+            return entry; 
         }
         catch (err) {
         // Only handle known unique constraint violations

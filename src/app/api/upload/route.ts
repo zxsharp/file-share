@@ -1,13 +1,9 @@
 import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { createUrlEntry } from '@/db/createUrlEntry';
-import { del } from '@vercel/blob';
-
-
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const body = (await request.json()) as HandleUploadBody;
+  let shortId;
  
   try {
     const jsonResponse = await handleUpload({
@@ -20,6 +16,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         // Generate a client token for the browser to upload the file
         // ⚠️ Authenticate and authorize users before generating the token.
         // Otherwise, you're allowing anonymous uploads.
+        // anyone can upload in this case
  
         return {
           addRandomSuffix: true,
@@ -33,19 +30,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         // ⚠️ This will not work on `localhost` websites,
         // Use ngrok or similar to get the full upload flow
  
-        console.log('blob upload completed', blob, tokenPayload);
- 
         try {
           // Run any logic after the file upload completed
           // const { userId } = JSON.parse(tokenPayload);
           // await db.update({ avatar: blob.url, userId });
 
-          await createUrlEntry(blob);
-
         } catch (err) {
-          console.log(err);
-          // deleting blob if unable to create it's entry in postgres
-          await del(blob.url);
+        
         }
       },
     });

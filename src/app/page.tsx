@@ -12,11 +12,13 @@ import { FilePlus2, FileText, File } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import DisplayFile from "@/components/DisplayFile";
+import axios from "axios";
 
 export default function Home() {
 
   const [file, setFile] = useState<File | null>(null);
-  const [blob, setBlob] = useState<PutBlobResult | null>(null)
+  const [blob, setBlob] = useState<PutBlobResult | null>(null);
+  const [shortId, setShortId] = useState<string>("");
   const [showUrl, setShowUrl] = useState<boolean>(false);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragCounter, setDragCounter] = useState<number>(0);
@@ -33,21 +35,41 @@ export default function Home() {
   async function handleUploadButtonClick(){
     if (!file) return;
 
+    // not so strict client side check (can be easily bypassed)
     if((file.size / 1024 / 1024) > 100){
-      alert("Max Limit is 100MB because 1GB is all vercel blob is granting in free tier :(");
+      alert("Max Limit is 100MB, try compressing the file :(");
       return;
     }
 
     setIsLoading(true);
 
-    const newBlob = await upload(file.name, file, {
-      access: 'public',
-      handleUploadUrl: '/api/upload',
-    });
+    let newBlob;
+    try{
+      newBlob = await upload(file.name, file, {
+        access: 'public',
+        handleUploadUrl: '/api/upload',
+      });
+    }
+    catch(err){}
 
     if(!newBlob){
-      alert("unable to upload try again");
+      alert("unable to upload :(");
+      setIsLoading(false);
       return;
+    }
+
+    try {
+      const res = await axios.post("/api/shorten", { 
+        blob: newBlob,
+        fileSize: (file.size / 1024 / 1024),
+        fileName: file.name
+      });
+      if(!res.data.shortId){
+        throw new Error("unable to provide short url");
+      }
+      setShortId(res.data.shortId);
+    } catch (error) {
+      console.error("Failed to shorten URL");
     }
 
     setBlob(newBlob);
@@ -176,7 +198,7 @@ export default function Home() {
         </div>
       }
 
-      {showUrl && blob && <DisplayFile {...blob} />}
+      {showUrl && blob && <DisplayFile blob={blob} shortId={shortId} />}
 
     </div>
   );
