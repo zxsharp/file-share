@@ -14,10 +14,15 @@ datasource db {
 }
 
 model Url {
-  id String @id 
+  id String @id
+  fileSize Float
+  fileName String 
   fileUrl String @unique
   downloadUrl String @unique
   createdAt DateTime @default(now())
   expire DateTime 
+
+  // indexing expire time because i enjoy such micro optimizations
+  @@index(fields: [expire])
 }
 
