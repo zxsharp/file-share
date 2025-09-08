@@ -11,5 +11,5 @@ jobs:
       - name: Call cleanup API
         run: |
           curl -s -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            "https://your-app.vercel.app/api/cleanup"
+            "https://file-share-jade.vercel.app/api/cleanup"
 
