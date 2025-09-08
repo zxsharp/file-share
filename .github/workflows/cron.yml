@@ -10,7 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Call cleanup API
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          curl -s -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+          set -euo pipefail
+          curl -sS -f -L \
+            -H "Authorization: Bearer $CRON_SECRET" \
             "https://file-share-jade.vercel.app/api/cleanup"
 
