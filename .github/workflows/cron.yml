@@ -1,6 +1,7 @@
 name: Cleanup Job
 
 on:
+  workflow_dispatch:   # allows manual trigger
   schedule:
     - cron: "0 */2 * * *" # every 2 hours
 
