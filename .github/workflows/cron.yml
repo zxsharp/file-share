@@ -1,0 +1,15 @@
+name: Cleanup Job
+
+on:
+  schedule:
+    - cron: "0 */2 * * *" # every 2 hours
+
+jobs:
+  run-cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call cleanup API
+        run: |
+          curl -s -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://your-app.vercel.app/api/cleanup"
+
