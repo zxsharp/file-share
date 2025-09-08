@@ -1,7 +1,6 @@
 import {
   Card,
   CardContent,
-  CardHeader,
   CardTitle,
 } from "@/components/ui/card"
 import { Link2 } from 'lucide-react';
@@ -20,7 +19,11 @@ export default function DisplayFile({blob, shortId}: PropsType) {
             <Card>
                 <CardContent className="space-y-5">
                     <div>
-                        <Link href={`/${shortId}`} className="flex items-center gap-2 text-blue-400">
+                        <Link 
+                        className="flex items-center gap-2 text-blue-400"
+                        href={`/${shortId}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer">
                             <Link2 />
                             {shortId}
                         </Link>
