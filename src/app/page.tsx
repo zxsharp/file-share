@@ -1,6 +1,5 @@
 "use client"
 import { useEffect, useRef, useState } from "react";
-import { type PutBlobResult } from '@vercel/blob';
 import { upload } from '@vercel/blob/client';
 import {
   Card,
@@ -11,14 +10,21 @@ import {
 import { FilePlus2, FileText, File } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import DisplayFile from "@/components/DisplayFile";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useStore } from "@/store/useStore";
 
 export default function Home() {
 
+  const router = useRouter();
+
+  const shortId = useStore((state) => state.shortId);
+  const blob = useStore((state) => state.blob);
+
+  const setShortId = useStore((state) => state.setShortId);
+  const setBlob = useStore((state) => state.setBlob);
+
   const [file, setFile] = useState<File | null>(null);
-  const [blob, setBlob] = useState<PutBlobResult | null>(null);
-  const [shortId, setShortId] = useState<string>("");
   const [showUrl, setShowUrl] = useState<boolean>(false);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragCounter, setDragCounter] = useState<number>(0);
@@ -78,12 +84,18 @@ export default function Home() {
     setShowUrl(true);
   }
 
+  // routing to /uploaded
+  useEffect(() => {
+    if(blob){
+      router.push("/uploaded")
+    }
+  }, [shortId, blob])
+
   function handleChooseButtonClick() {
     if (hiddenFileInput.current) {
       (hiddenFileInput.current as HTMLInputElement).click();
     }
   }
-
 
   useEffect(() => {
     const preventDefault = (e: DragEvent) => {
@@ -197,9 +209,6 @@ export default function Home() {
           
         </div>
       }
-
-      {showUrl && blob && <DisplayFile blob={blob} shortId={shortId} />}
-
     </div>
   );
 }

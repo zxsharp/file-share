@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { findUrlEntry } from '@/db/findUrlEntry';
+import { ExternalLink } from 'lucide-react';
 
 type PropsType = {
   params: Promise<{id: string}>
@@ -21,7 +22,14 @@ export default async function IdPage({ params }: PropsType) {
               <Card>
                   <CardHeader>File Name</CardHeader>
                   <CardContent className="space-y-5 text-blue-400 underline">
-                      <a href={`${entry.fileUrl}`}>{entry.fileName}</a>
+                    <a 
+                    className='flex items-center gap-2'
+                    href={`${entry.fileUrl}`}
+                    >
+                      {entry.fileName}
+                      <ExternalLink className="w-5 h-5" />
+                    </a>
+                    
                   </CardContent>
               </Card>
               <Card>
