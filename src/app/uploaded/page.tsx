@@ -29,7 +29,7 @@ export default function Uploaded() {
         <div className="flex flex-col justify-center items-center min-h-screen bg-background gap-4">
             <Button onClick={() => {
                 setBlob(null);
-                router.push('/')
+                router.push('/');
             }}>
                 Back
             </Button>
