@@ -10,12 +10,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       request,
       onBeforeGenerateToken: async (
         pathname,
-        /* clientPayload */
+        clientPayload 
       ) => {
         // Generate a client token for the browser to upload the file
         // ⚠️ Authenticate and authorize users before generating the token.
         // Otherwise, you're allowing anonymous uploads.
         // anyone can upload in this case
+
+        // file size check 
+        if(parseFloat(clientPayload ?? "0") > 100){
+          return {error: "File size exceeded"}
+        }
  
         return {
           addRandomSuffix: true,
