@@ -41,6 +41,7 @@ export async function cleanupExpiredFiles() {
   }
   catch(err) {
     console.log("failed to delete", err);
+    console.log(expired);
     return null;
   }
 
