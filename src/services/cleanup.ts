@@ -24,22 +24,24 @@ export async function cleanupExpiredFiles() {
     return null;
   }
 
-  for (const file of expired) {
-    try {
-      
-      // this won't throw error
-      await del(file.fileUrl) 
+  const ids = expired.map(file => file.id);
+  const fileUrls = expired.map(file => file.fileUrl);
 
-      await prisma.url.delete({ 
+  try{
+      // this won't throw error
+      await del(fileUrls);
+
+      await prisma.url.deleteMany({ 
         where: { 
-            id: file.id 
+            id: {
+              in: ids
+            }
         } 
       }) 
-      console.log(`Deleted file: ${file.fileUrl}`)
-    } catch (err) {
-      console.log(`Failed to delete ${file.fileUrl}:`, err);
-      return null;
-    }
+  }
+  catch(err) {
+    console.log("failed to delete", err);
+    return null;
   }
 
   return expired.length;
