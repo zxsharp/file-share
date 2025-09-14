@@ -9,9 +9,9 @@ export async function cleanupExpiredFiles() {
   try{
     expired = await prisma.url.findMany({
         where: {
-        expire: {
-            lte: now,
-        },
+          expire: {
+              lte: now,
+          },
         },
         select: {
             id: true,
@@ -22,6 +22,10 @@ export async function cleanupExpiredFiles() {
   catch(err){
     console.log("unable to find any expired files", err);
     return null;
+  }
+
+  if(expired.length === 0){
+    return 0;
   }
 
   const ids = expired.map(file => file.id);
