@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 export function GridPattern({ children, className }: { children: React.ReactNode, className?: string }) {

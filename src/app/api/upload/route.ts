@@ -19,7 +19,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
         // file size check 
         if(parseFloat(clientPayload ?? "0") > 100){
-          return {error: "File size exceeded"}
+          throw new Error("File size exceeded");
         }
  
         return {
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           }),
         };
       },
-      onUploadCompleted: async ({ blob, tokenPayload }) => {
+      onUploadCompleted: async () => {
         // Get notified of client upload completion
         // ⚠️ This will not work on `localhost` websites,
         // Use ngrok or similar to get the full upload flow
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           // const { userId } = JSON.parse(tokenPayload);
           // await db.update({ avatar: blob.url, userId });
 
-        } catch (err) {
+        } catch {
         
         }
       },

@@ -4,7 +4,17 @@ import { motion } from "framer-motion";
 import { Monitor, Cloud, Smartphone, FileUp, FileDown, RefreshCw } from "lucide-react";
 import { GridPattern } from "./grid-pattern";
 
-const IconBlock = ({ icon: Icon, label, className, iconClass, borderHoverClass }: any) => (
+import { type ElementType } from "react";
+
+interface IconBlockProps {
+  icon: ElementType;
+  label: string;
+  className?: string;
+  iconClass?: string;
+  borderHoverClass?: string;
+}
+
+const IconBlock = ({ icon: Icon, label, className, iconClass, borderHoverClass }: IconBlockProps) => (
   <div className={`absolute group flex flex-col items-center justify-center z-10 ${className}`}>
     <div className={`relative bg-card p-4 sm:p-5 rounded-2xl border-2 shadow-xl transition-all duration-300 group-hover:scale-110 cursor-default ${borderHoverClass}`}>
       <Icon className={`w-8 h-8 sm:w-10 sm:h-10 transition-colors ${iconClass}`} />

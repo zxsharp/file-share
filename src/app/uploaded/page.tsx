@@ -22,7 +22,7 @@ export default function Uploaded() {
         if(!blob){
             router.replace('/');
         }
-    }, [blob]);
+    }, [blob, router]);
 
     if(!blob){
         return null;

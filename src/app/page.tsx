@@ -105,7 +105,7 @@ export default function Home() {
       setShortId(res.data.shortId);
     } 
     catch (error) {
-      console.error("Failed to shorten URL");
+      console.error("Failed to shorten URL", error);
     }
 
     setBlob(newBlob);
@@ -123,7 +123,7 @@ export default function Home() {
     if(blob){
       router.push("/uploaded");
     }
-  }, [shortId, blob])
+  }, [shortId, blob, router])
 
   function handleChooseButtonClick() {
     if (hiddenFileInput.current) {

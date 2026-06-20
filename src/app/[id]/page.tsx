@@ -4,6 +4,7 @@ import { findUrlEntry } from '@/db/findUrlEntry';
 import { ExternalLink, FileText, Download, AlertCircle } from 'lucide-react';
 import { Navbar } from "@/components/navbar";
 import { GridPattern } from "@/components/grid-pattern";
+import Link from "next/link";
 
 type PropsType = {
   params: Promise<{id: string}>
@@ -77,7 +78,7 @@ export default async function IdPage({ params }: PropsType) {
             <h1 className="text-3xl font-bold tracking-tight">File Not Found</h1>
             <p className="text-muted-foreground text-center">The file you are looking for does not exist or has been deleted.</p>
             <Button asChild className="mt-4 rounded-xl px-8" variant="outline">
-                <a href="/">Return Home</a>
+                <Link href="/">Return Home</Link>
             </Button>
           </div>
         )}
