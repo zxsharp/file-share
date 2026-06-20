@@ -15,6 +15,9 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/store/useStore";
 import { Progress } from "@/components/ui/progress";
+import { Navbar } from "@/components/navbar";
+import { Hero } from "@/components/hero";
+import { motion } from "framer-motion";
 
 export default function Home() {
 
@@ -178,34 +181,45 @@ export default function Home() {
       onDrop={handleDrop}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
-      className="min-h-screen"
+      className="min-h-screen flex flex-col bg-background"
     >
+      <Navbar />
 
       {/* show top level background when dragging */}
       {(isDragging) && 
-        <div className="fixed inset-0 z-[9999] bg-foreground/70 pointer-events-none flex justify-center text-3xl text-card/70 " />
+        <div className="fixed inset-0 z-[9999] bg-background/80 backdrop-blur-sm pointer-events-none flex justify-center items-center text-4xl font-extrabold text-primary transition-all duration-300">
+          Drop file to upload
+        </div>
       }
 
+      <Hero />
       
-      <div  
-        className={`px-2 flex justify-center items-center min-h-screen bg-background`}
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.4, ease: "easeOut" }}
+        className="px-4 pb-20 flex justify-center items-start flex-1 -mt-10 relative z-20 w-full"
       >
         <Card
-          className="w-full max-w-lg bg-card border-dashed border-4">
-          <CardHeader className="text-center">
-            <div className="flex justify-center">
-              <FilePlus2 className="size-20"/>
+          className="w-full max-w-xl backdrop-blur-xl border-dashed border-2 border-primary/20 shadow-2xl hover:shadow-[0_0_40px_rgba(var(--primary),0.3)] transition-all duration-500 rounded-2xl bg-card/60 relative overflow-hidden group"
+        >
+          {/* Central radial glow similar to grid bg */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[300px] w-[300px] rounded-full bg-primary/30 opacity-0 group-hover:opacity-40 blur-[80px] transition-opacity duration-500 pointer-events-none" />
+          <CardHeader className="text-center pb-2 pt-4 relative z-10">
+            <div className="flex justify-center mb-2 text-primary transition-transform duration-500 group-hover:scale-110 drop-shadow-md">
+              <FilePlus2 className="size-12 opacity-80 transition-transform duration-300 hover:rotate-12"/>
             </div>
-            <CardTitle>Drop your file here</CardTitle>
+            <CardTitle className="text-xl font-bold">Upload a File</CardTitle>
+            <p className="text-muted-foreground text-sm mt-1">Drag and drop or choose a file to upload</p>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent className="space-y-4 pt-2 relative z-10">
             
             <div className="flex justify-center">
               <Button 
                 onClick={handleChooseButtonClick}
-                className="bg-primary cursor-pointer rounded-none"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-primary/25 cursor-pointer rounded-full px-8 transition-all duration-300 group/btn"
               >
-                <File /> Choose File
+                <File className="mr-2 h-4 w-4 transition-transform duration-300 group-hover/btn:-translate-y-1 group-hover/btn:scale-110" /> Choose File
               </Button>
               <Input 
                 type="file"
@@ -218,53 +232,58 @@ export default function Home() {
             </div>
             
             {file && (
-              <>
-                <div className="flex items-center gap-2 p-3 bg-muted rounded-md">
-                  <FileText className="h-4 w-4 text-primary" />
-                  <div className="flex-1">
-                      <p className="text-sm font-medium">{file.name}</p>
-                      <p className="text-xs text-muted-foreground">
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-xl border transition-all hover:bg-muted/80 hover:border-primary/30 group/file">
+                  <div className="p-2 bg-primary/10 rounded-lg transition-transform duration-300 group-hover/file:scale-110 group-hover/file:rotate-6">
+                    <FileText className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="flex-1 overflow-hidden">
+                      <p className="text-sm font-semibold truncate">{file.name}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
                           {(file.size / 1024 / 1024).toFixed(2)} MB
                       </p>
                   </div>
                 </div>
-                <div className="text-red-400 font-medium">
+                <div className="text-red-400 font-medium text-sm mt-2 px-1">
                       {((file.size / 1024 / 1024) > 100) && "File size is over 100MB"}
                 </div>
-              </>
+              </div>
             )}
 
             {isLoading && (
-              <div className="flex flex-col gap-1.5">
-                <div className="flex gap-1 items-center">
+              <div className="flex flex-col gap-2 p-4 bg-muted/30 rounded-xl border animate-in fade-in">
+                <div className="flex gap-3 items-center">
                   <Progress
-                  className="h-4"
-                  value={uploadProgress}
+                    className="h-2 flex-1"
+                    value={uploadProgress}
                   />
                   <Button 
-                  className="rounded-full text-foreground bg-ring/10 hover:bg-ring/20 cursor-pointer"
-                  onClick={cancelUploadRequest}
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer"
+                    onClick={cancelUploadRequest}
                   >
-                    <X />
+                    <X className="h-4 w-4" />
                   </Button>
                 </div>
-                <div className="flex justify-center text-primary">
-                  {uploadProgress} % ...
+                <div className="flex justify-between items-center text-xs text-muted-foreground px-1">
+                  <span>Uploading...</span>
+                  <span className="font-medium text-primary">{Math.round(uploadProgress)}%</span>
                 </div>
               </div> 
             )} 
               
             <Button
-              disabled={!file || isLoading}
+              disabled={!file || isLoading || ((file?.size ?? 0) / 1024 / 1024 > 100)}
               onClick={handleUploadButtonClick}
-              className="w-full cursor-pointer"
+              className="w-full cursor-pointer h-12 text-base font-semibold shadow-xl shadow-primary/20 transition-all rounded-xl hover:shadow-primary/40 hover:-translate-y-0.5"
             >
-              {isLoading ? 'Uploading...': 'Upload'}
+              {isLoading ? 'Processing...': 'Upload Now'}
             </Button>
           </CardContent>
         </Card>
         
-      </div>
+      </motion.div>
       
     </div>
   );
